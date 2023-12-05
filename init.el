@@ -1,6 +1,8 @@
 
 (setq inhibit-startup-message t)
 
+(auto-package-update-maybe)
+
 (scroll-bar-mode -1)        ; Disable visible scrollbar
 (tool-bar-mode -1)          ; Disable the toolbar
 (tooltip-mode -1)           ; Disable tooltips
@@ -8,12 +10,13 @@
 
 (menu-bar-mode -1)            ; Disable the menu bar
 
+(when (not package-archive-contents)
+    (package-refresh-contents))
+
 ;; Set up the visible bell
 (setq visible-bell t)
 
 (set-face-attribute 'default nil :font "Fira Code Retina" :height 140)
-
-(load-theme 'wombat)
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -26,8 +29,6 @@
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
-(unless package-archive-contents
- (package-refresh-contents))
 
 ;; Initialize use-package on non-Linux platforms
 (unless (package-installed-p 'use-package)
@@ -70,7 +71,7 @@
  '(custom-safe-themes
    '("5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874" default))
  '(package-selected-packages
-   '(all-the-icons hydra evil-collection general doom-themes helpful counsel ivy-rich which-key rainbow-delimiters evil doom-modeline ivy command-log-mode)))
+   '(evil-magit magit counsel-projectile projectile all-the-icons hydra evil-collection general doom-themes helpful counsel ivy-rich which-key rainbow-delimiters evil doom-modeline ivy command-log-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -174,3 +175,28 @@
 
 (rune/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale text"))
+
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  ;; NOTE: Set this to the folder where you keep your Git repos!
+  (when (file-directory-p "~/Projects/Code")
+    (setq projectile-project-search-path '("~/Projects/Code")))
+  (setq projectile-switch-project-action #'projectile-dired))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+;; ;; NOTE: Make sure to configure a GitHub token before using this package!
+;; ;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
+;; ;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
+(setq auth-sources '("~/.authinfo"))
+(use-package forge)
