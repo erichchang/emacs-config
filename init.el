@@ -1,6 +1,3 @@
-;; NOTE: init.el is now generated from Emacs.org.  Please edit that file
-;;       in Emacs and init.el will be generated automatically!
-
 ;; You will most likely need to adjust this font size for your system!
 (defvar efs/default-font-size 170)
 (defvar efs/default-variable-font-size 170)
@@ -348,60 +345,22 @@
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 
 ;; LSP Setup 
-(use-package lsp-mode
-  :hook ((c-mode          ; clangd
-          c++-mode        ; clangd
-          c-or-c++-mode   ; clangd
-          java-mode       ; eclipse-jdtls
-          js-mode         ; ts-ls (tsserver wrapper)
-          js-jsx-mode     ; ts-ls (tsserver wrapper)
-          typescript-mode ; ts-ls (tsserver wrapper)
-          python-mode     ; pyright
-          web-mode        ; ts-ls/HTML/CSS
-          haskell-mode    ; haskell-language-server
-          ) . lsp-deferred)
-  :commands lsp
-  :config
-  (setq lsp-auto-guess-root t)
-  (setq lsp-log-io nil)
-  (setq lsp-restart 'auto-restart)
-  (setq lsp-enable-symbol-highlighting nil)
-  (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-signature-auto-activate nil)
-  (setq lsp-signature-render-documentation nil)
-  (setq lsp-eldoc-hook nil)
-  (setq lsp-modeline-code-actions-enable nil)
-  (setq lsp-modeline-diagnostics-enable nil)
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-semantic-tokens-enable nil)
-  (setq lsp-enable-folding nil)
-  (setq lsp-enable-imenu nil)
-  (setq lsp-enable-snippet nil)
-  (setq read-process-output-max (* 1024 1024)) ;; 1MB
-  (setq lsp-idle-delay 0.5))
+(defun efs/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
 
-(use-package lsp-ui
-  :commands lsp-ui-mode
+(use-package lsp-mode 
+  :bind-keymap
+  ("C-c l" . lsp-command-map)
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . efs/lsp-mode-setup)
   :config
-  (setq lsp-ui-doc-enable nil)
-  (setq lsp-ui-doc-header t)
-  (setq lsp-ui-doc-include-signature t)
-  (setq lsp-ui-doc-border (face-foreground 'default))
-  (setq lsp-ui-sideline-show-code-actions t)
-  (setq lsp-ui-sideline-delay 0.05))
+  (lsp-enable-which-key-integration t))
 
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
   :custom
-  (lsp-ui-doc-position 'bottom)
-  :commands lsp-ui-mode
-  :config
-  (setq lsp-ui-doc-enable nil)
-  (setq lsp-ui-doc-header t)
-  (setq lsp-ui-doc-include-signature t)
-  (setq lsp-ui-doc-border (face-foreground 'default))
-  (setq lsp-ui-sideline-show-code-actions t)
-  (setq lsp-ui-sideline-delay 0.05))
+  (lsp-ui-doc-position 'bottom))
 
 (use-package lsp-treemacs
   :after lsp)
@@ -472,10 +431,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(evil-nerd-commenter lsp-java lsp-pyright company-box company typescript-mode lsp-ivy lsp-treemacs lsp-ui lsp-mode which-key visual-fill-column rainbow-delimiters org-bullets ivy-rich hydra helpful general forge evil-collection doom-themes doom-modeline counsel-projectile command-log-mode auto-package-update all-the-icons)))
+   '(lsp-java lsp-pyright lsp-ivy lsp-treemacs lsp-ui lsp-mode which-key visual-fill-column typescript-mode treemacs spinner request rainbow-delimiters org-bullets ivy-rich helpful general forge evil-nerd-commenter evil-collection doom-themes doom-modeline counsel-projectile company-box command-log-mode bui auto-package-update all-the-icons)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+
